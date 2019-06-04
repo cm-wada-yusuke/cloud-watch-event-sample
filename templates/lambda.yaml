@@ -17,6 +17,39 @@ Resources:
           ENV: !Ref Env
           GREETING_TABLE_NAME: !Ref GreetingTableName
           REGION: !Ref AWS::Region
+  HelloWorldCreateCloudWatchEventLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${Env}-${AppName}-create-cloud-watch-event
+      Role: !GetAtt HelloWorldLambdaRole.Arn
+      Handler: cloud-watch-event-handler/index.createEvent
+      Runtime: nodejs10.x
+      CodeUri:
+        Bucket: !Ref DeployBucketName
+        Key: !Sub ${ChangeSetHash}/dist.zip
+      Timeout: 5
+      Environment:
+        Variables:
+          ENV: !Ref Env
+          REGION: !Ref AWS::Region
+          GREETING_LAMBDA_ARN: !GetAtt HelloWorldHelloLambda.Arn
+  HelloWorldRemoveCloudWatchEventLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${Env}-${AppName}-remove-cloud-watch-event
+      Role: !GetAtt HelloWorldLambdaRole.Arn
+      Handler: cloud-watch-event-handler/index.removeEvent
+      Runtime: nodejs10.x
+      CodeUri:
+        Bucket: !Ref DeployBucketName
+        Key: !Sub ${ChangeSetHash}/dist.zip
+      Timeout: 5
+      Environment:
+        Variables:
+          ENV: !Ref Env
+          REGION: !Ref AWS::Region
+          GREETING_LAMBDA_ARN: !GetAtt HelloWorldHelloLambda.Arn
+
 
   HelloWorldLambdaRole:
     Type: 'AWS::IAM::Role'
@@ -26,6 +59,8 @@ Resources:
         - 'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess'
         - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
         - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
+        - 'arn:aws:iam::aws:policy/CloudWatchEventsFullAccess'
+        - 'arn:aws:iam::aws:policy/AWSLambdaFullAccess'
       Policies:
         - PolicyName: PermissionToPassAnyRole
           PolicyDocument:

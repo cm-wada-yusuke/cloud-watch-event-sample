@@ -2,6 +2,7 @@ import 'source-map-support/register';
 import * as AWS from 'aws-sdk';
 import { UpdateItemInput } from 'aws-sdk/clients/dynamodb';
 import * as uuid from 'uuid';
+import { IGreetingRequest } from '../greeting';
 
 const EnvironmentVariableSample = process.env.GREETING_TABLE_NAME!;
 const Region = process.env.REGION!;
@@ -13,21 +14,21 @@ const DYNAMO = new AWS.DynamoDB(
     }
 );
 
-exports.handler = async (event: any) => {
+exports.handler = async (event: IGreetingRequest) => {
     return HelloWorldController.hello(event);
 };
 
 export class HelloWorldController {
 
-    public static hello(payload: any): Promise<IGreeting> {
+    public static hello(payload: IGreetingRequest): Promise<IGreeting> {
         console.log(payload);
-        return GreetingDynamodbTable.greetingStore(this.createMessage());
+        return GreetingDynamodbTable.greetingStore(this.createMessage(payload));
     }
 
-    private static createMessage(): IGreeting {
+    private static createMessage(payload: IGreetingRequest): IGreeting {
         return {
             title: 'hello, lambda!',
-            description: 'my first message.',
+            description: payload.greet,
         }
     }
 }

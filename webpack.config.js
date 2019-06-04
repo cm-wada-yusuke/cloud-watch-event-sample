@@ -6,6 +6,7 @@ module.exports = {
     target: 'node',
     entry: {
         'hello-world': path.resolve(__dirname, './src/lambda/handlers/hello/hello-world.ts'),
+        'cloud-watch-event-handler': path.resolve(__dirname, './src/lambda/handlers/cli/cloud-watch-event-handler.ts'),
     },
     externals: [nodeExternals({
         modulesFromFile: {
