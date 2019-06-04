@@ -1,0 +1,5 @@
+{
+  "nameSpace": "cm",
+  "appName": "cloud-watch-event-sample",
+  "defaultRegion": "ap-northeast-1"
+}
