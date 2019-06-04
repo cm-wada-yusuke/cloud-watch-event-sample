@@ -78,7 +78,7 @@ class CloudWatchEventHandler {
             FunctionName: GreetingLambdaArn,
             Principal: 'events.amazonaws.com',
             SourceArn: putResult.RuleArn,
-            StatementId: createRuleParam.Name
+            StatementId: createRuleParam.Name,
         };
 
         await AWSLambda.addPermission(addPermissionParams).promise();
@@ -105,6 +105,7 @@ class CloudWatchEventHandler {
             const targetPolicy = policyDocument.Statement
                 .find(statement => statement.Condition.ArnLike['AWS:SourceArn'].includes(result.ruleName));
 
+            // ポリシーが見つかったらSidを指定して削除する
             if (targetPolicy) {
                 console.log('policy found:', targetPolicy);
                 const removePolicyParam: RemovePermissionRequest = {
@@ -116,6 +117,7 @@ class CloudWatchEventHandler {
             }
         }
 
+        // ② - CloudWatch Event のターゲットを削除する
         const removeTargetParam: RemoveTargetsRequest = {
             Ids: [result.ruleName],
             Rule: result.ruleName
@@ -127,6 +129,7 @@ class CloudWatchEventHandler {
             console.log(`failed to delete targets:`, e);
         }
 
+        // ③ - CloudWatch Event のルールを削除する
         const deleteRuleParam: DeleteRuleRequest = {
             Name: result.ruleName,
             Force: true
